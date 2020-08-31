@@ -16,7 +16,7 @@ from keras.applications import resnet50
 
 
 
-rawdf = pd.read_csv('/Users/aravind/OneDrive/OneDocuments/Data/DeepLearning/BioTrainCat.csv')
+rawdf = pd.read_csv('/Users/aravind/OneDrive/OneDocuments/AlgorithmData/DeepLearning/BioTrainCat.csv')
 
 #One hot encoding Categorical
 rawhourdf = pd.get_dummies(rawdf['Hour'],prefix='hour')
@@ -53,7 +53,7 @@ scratchModel.add(Dense(3,activation='softmax',name = 'output_layer'))
 
 scratchModel.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-
+"""
 
 RunName = "model3"
 #Building the model
@@ -65,7 +65,7 @@ scratchModel.add(Dense(3,activation='softmax',name = 'output_layer'))
 scratchModel.compile(loss='categorical_crossentropy', optimizer='SGD', metrics=['accuracy'])
 
 
-"""
+
 
 
 #TensorBoard Logger
