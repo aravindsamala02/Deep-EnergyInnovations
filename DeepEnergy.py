@@ -35,6 +35,7 @@ scaler = MinMaxScaler(feature_range = (0,1))
 scaledfeatureData = pd.DataFrame(scaler.fit_transform(featureData))
 
 
+#Testing various models
 
 """ RunName = "model1"
 #Building the model
@@ -89,7 +90,7 @@ print(error_rate, accuracy)
 
 
 
-
+#K-Fold Cross Validation
 
 
 """
