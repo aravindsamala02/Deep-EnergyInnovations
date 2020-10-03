@@ -16,15 +16,18 @@ from keras.applications import resnet50
 
 
 
-rawdf = pd.read_csv('/Users/aravind/OneDrive/OneDocuments/AlgorithmData/DeepLearning/BioTrainCat.csv')
+df = pd.read_csv('DataFiles/BioTrainCat.csv')
 
 #One hot encoding Categorical
-rawhourdf = pd.get_dummies(rawdf['Hour'],prefix='hour')
-rawdatedf = pd.get_dummies(rawdf['Date'],prefix='date')
-rawdfencoded = pd.concat([rawdf,rawdatedf,rawhourdf],axis =1)
 
-featureData = rawdfencoded.drop(['kW','Hour','Date'],axis=1).values
-targetData = pd.get_dummies(rawdf['kW'],prefix='kW')
+hourdf = pd.get_dummies(df['Hour'],prefix='hour')
+#rawdatedf = pd.get_dummies(rawdf['Date'],prefix='date')
+dfencoded = pd.concat([df,hourdf],axis =1)
+
+featureData = dfencoded.drop(['kW','Hour','Date'],axis=1).values
+targetData = pd.get_dummies(df['kW'],prefix='kW')
+
+
 
 #scaling
 
@@ -33,16 +36,12 @@ scaledfeatureData = pd.DataFrame(scaler.fit_transform(featureData))
 
 
 
-"""
-RunName = "model1"
+""" RunName = "model1"
 #Building the model
 scratchModel = Sequential()
 scratchModel.add(Dense(10,input_dim=59,activation='relu', name = 'layer_1'))
 scratchModel.add(Dense(5,activation='relu',name = 'layer_2'))
 scratchModel.add(Dense(3,activation='softmax',name = 'output_layer'))
-
-
-
 
 RunName = "model2"
 #Building the model
@@ -54,6 +53,7 @@ scratchModel.add(Dense(3,activation='softmax',name = 'output_layer'))
 scratchModel.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 """
+
 
 RunName = "model3"
 #Building the model
@@ -67,7 +67,7 @@ scratchModel.compile(loss='categorical_crossentropy', optimizer='SGD', metrics=[
 
 
 
-
+"""
 #TensorBoard Logger
 
 logger = keras.callbacks.TensorBoard(
@@ -76,12 +76,12 @@ logger = keras.callbacks.TensorBoard(
     histogram_freq=5
 )
 
-
+"""
 
 
 
 #fitting the data
-scratchModel.fit(scaledfeatureData,targetData,epochs=100,shuffle=True,verbose=2,callbacks=[logger])
+scratchModel.fit(scaledfeatureData,targetData,epochs=100,shuffle=True,verbose=2)
 
 error_rate,accuracy = scratchModel.evaluate(scaledfeatureData,targetData,verbose=0)
 
@@ -106,8 +106,6 @@ def createmodel():
 
 seed = 7
 np.random.seed(seed)
-
-
 
 model = KerasClassifier(build_fn = createmodel,epochs = 50, batch_size = 10, verbose = 0)
 kfold = KFold(n_splits=10, shuffle=True, random_state=seed)
