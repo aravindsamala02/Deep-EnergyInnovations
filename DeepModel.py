@@ -10,21 +10,29 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 
 
-with open("Data/DF_Cleaned.pkl",'rb') as file:
+with open("Data/df_cleaned.pkl",'rb') as file:
     df = pickle.load(file)
 
 
 #One hot encoding Categorical
-BTypedf = pd.get_dummies(df['BType'],prefix='BType')
-df = pd.concat([df,BTypedf],axis =1)
+BTypeDF = pd.get_dummies(df['BType'],prefix='BType')
+HourDF = pd.get_dummies(df['Hour'],prefix='Hour')
+df = pd.concat([df,BTypeDF,HourDF],axis =1)
 
-featureData = df.drop(['Energy','Name'],axis=1).values
-y = df['Energy'].values
+Energy = df['Energy'].values
+
+bins = np.linspace(0,1000,20)
+Energy = pd.cut(Energy,bins,labels = False)
+y = pd.get_dummies(Energy,prefix='Energy')
+#y = pd.factorize(y)[0]
+
+
+featureData = df.drop(['Energy','Name','Hour','BType'],axis=1).values
 
 #scaling
 
 scaler = MinMaxScaler(feature_range = (0,1))
-X = pd.DataFrame(scaler.fit_transform(featureData))
+X = scaler.fit_transform(featureData)
 
 
 #Testing various models
@@ -48,15 +56,17 @@ model2.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accu
 
 
 RunName = "model3"
-#Building the model
+
+
+#Initializing and parameter tuning
+
 model3 = Sequential()
-model3.add(Dense(50,input_dim=59,activation='relu', name = 'layer_1'))
+model3.add(Dense(50,input_dim=34,activation='relu', name = 'layer_1'))
 model3.add(Dense(20,activation='relu',name = 'layer_2'))
-model3.add(Dense(3,activation='softmax',name = 'output_layer'))
+model3.add(Dropout(0.5))
+model3.add(Dense(15,activation='softmax',name = 'output_layer'))
 
 model3.compile(loss='categorical_crossentropy', optimizer='SGD', metrics=['accuracy'])
-
-
 
 
 """
@@ -73,13 +83,14 @@ logger = keras.callbacks.TensorBoard(
 
 
 #fitting the data
-model3.fit(X,y,epochs=100,shuffle=True,verbose=2)
 
+model3.fit(X,y,epochs=100,shuffle=True,verbose=2)
 error_rate,accuracy = model3.evaluate(X,y,verbose=0)
 
-print(error_rate, accuracy)
 
-
+with open('nn.pkl','wb') as file:
+    pickle.dump(accuracy,file)
+    file.close()
 
 #K-Fold Cross Validation
 

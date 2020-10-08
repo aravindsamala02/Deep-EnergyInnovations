@@ -6,23 +6,26 @@ from sklearn.linear_model import LinearRegression
 
 
 
-with open("Data/DF_Cleaned.pkl",'rb') as file:
+with open("Data/df_cleaned.pkl",'rb') as file:
     df = pickle.load(file)
 
-df.Btype = pd.factorize(df.Btype)[0]
+df.BType = pd.factorize(df.BType)[0]
+df.BType = pd.factorize(df.Hour)[0]
 
-
-featureData = df.drop(['Energy'],axis=1).values
+df_values = df.drop(['TMIN','TMAX','Name','Hour'],axis=1).values
 y = df['Energy'].values
 
 #scaling
 
 scaler = MinMaxScaler(feature_range = (0,1))
-X  = scaler.fit_transform(featureData)
+X = scaler.fit_transform(df_values)
+#y = scaler.fit_transform(y_values)
 
+#ran the model on EC2 instance for performance
 
 LinReg = LinearRegression(normalize = True)
 LinReg.fit(X,y)
+
 score  = LinReg.score(X,y)
 
 
